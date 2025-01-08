@@ -16,7 +16,7 @@ app = dash.Dash(
 file_path = "Asir.xlsx"
 df = pd.read_excel(file_path)
 
-# 创建 3D 散点图，确保 custom_data 包含所有需要的信息
+# 创建 3D 散点图
 fig = px.scatter_3d(
     df,
     x="Soil-axis",
@@ -25,11 +25,11 @@ fig = px.scatter_3d(
     color="Significance",
     symbol="Plant Type",
     size="Significance count",
-    hover_data=["Species"],
+    hover_data=["Species"],  # 仅保留物种名称
     custom_data=["Photo route", "Species"]  # 包含图片路径和 Species
 )
 
-# 图表布局设置，调整图例的位置
+# 图表布局设置，调整图例和图表布局
 fig.update_layout(
     scene=dict(
         xaxis_title="Soil Type<br>0: Salty | 1: Sandy | 2: Rocky | 3: Loamy Soil",
@@ -38,9 +38,11 @@ fig.update_layout(
     ),
     margin=dict(l=0, r=0, t=0, b=0),
     legend=dict(
-        x=0,  # 图例移动到左下角
-        y=-0.2,
-        orientation="h"  # 水平显示图例
+        x=0,  # 图例左对齐
+        y=0,  # 图例底部对齐
+        orientation="h",  # 水平显示图例
+        xanchor="left",
+        yanchor="bottom"
     )
 )
 
@@ -60,27 +62,32 @@ app.layout = html.Div([
             'borderRadius': '5px',
             'background': 'white',
             'visibility': 'hidden',
-            'max-width': '90%',  # 限制 Tooltip 的宽度
-            'word-wrap': 'break-word',  # 防止内容溢出
-            'bottom': '10px',  # Tooltip 在屏幕底部显示，避免重叠
-            'left': '50%',    # 水平居中
-            'transform': 'translateX(-50%)'  # 居中对齐
+            'max-width': '300px',
+            'word-wrap': 'break-word',
+            'bottom': '10px',  # Tooltip 在右下方显示
+            'right': '10px',  # 靠右对齐
         }
     )
 ], style={'position': 'relative', 'height': '100vh'})
 
-# 悬浮时更新 Tooltip
+# 回调函数，处理 Hover 和隐藏
 @app.callback(
     [Output('tooltip-container', 'children'),
      Output('tooltip-container', 'style')],
-    Input('3d-scatter-plot', 'hoverData')
+    [Input('3d-scatter-plot', 'hoverData'),
+     Input('3d-scatter-plot', 'clickData')]  # 添加 clickData 输入
 )
-def update_tooltip(hover_data):
-    if hover_data is None:
+def update_tooltip(hover_data, click_data):
+    if hover_data is None and click_data is None:
+        # 隐藏 Tooltip
         return None, {'visibility': 'hidden'}
 
-    # 从 hover_data 中提取 customdata
-    customdata = hover_data['points'][0]['customdata']
+    # 如果 Hover 或点击事件中包含数据
+    if hover_data:
+        customdata = hover_data['points'][0]['customdata']
+    elif click_data:
+        customdata = click_data['points'][0]['customdata']
+
     photo_url = customdata[0]  # 图片链接
     species = customdata[1]    # 植物名称
 
@@ -92,11 +99,10 @@ def update_tooltip(hover_data):
         'borderRadius': '5px',
         'background': 'white',
         'visibility': 'visible',
-        'max-width': '90%',  # 限制 Tooltip 宽度
-        'word-wrap': 'break-word',  # 自动换行
-        'bottom': '10px',  # Tooltip 在屏幕底部显示
-        'left': '50%',    # 水平居中
-        'transform': 'translateX(-50%)'  # 居中对齐
+        'max-width': '300px',
+        'word-wrap': 'break-word',
+        'bottom': '10px',
+        'right': '10px',  # 靠右下对齐
     }
 
     content = html.Div(
@@ -106,8 +112,8 @@ def update_tooltip(hover_data):
                 style={
                     'width': '200px', 
                     'height': '200px',
-                    'object-fit': 'cover',  # 防止拉伸，保持图片比例
-                    'borderRadius': '5px'  # 可选：添加圆角
+                    'object-fit': 'cover',
+                    'borderRadius': '5px'
                 }
             ),
             html.P(f"Species: {species}")
