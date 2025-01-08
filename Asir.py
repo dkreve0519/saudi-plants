@@ -4,8 +4,13 @@ import plotly.express as px
 import pandas as pd
 import os
 
-# 创建 Dash 应用
-app = dash.Dash(__name__)
+# 创建 Dash 应用并添加 meta_tags 适配移动端
+app = dash.Dash(
+    __name__,
+    meta_tags=[
+        {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
+    ]
+)
 
 # 加载 Excel 数据
 file_path = "Asir.xlsx"
@@ -38,7 +43,8 @@ fig.update_layout(
 app.layout = html.Div([
     dcc.Graph(
         id='3d-scatter-plot',
-        figure=fig
+        figure=fig,
+        style={'width': '100%', 'height': '75vh'}  # 自适应屏幕
     ),
     html.Div(
         id='tooltip-container',
@@ -49,9 +55,11 @@ app.layout = html.Div([
             'borderRadius': '5px',
             'background': 'white',
             'visibility': 'hidden',
+            'max-width': '90%',  # 限制 Tooltip 的宽度
+            'word-wrap': 'break-word',  # 防止内容溢出
             'bottom': '50px',  # 设置位置为下方
             'left': '50%',    # 水平居中
-            'transform': 'translateX(-50%)'  # 调整 Tooltip 居中对齐
+            'transform': 'translateX(-50%)'  # 居中对齐
         }
     )
 ], style={'position': 'relative', 'height': '100vh'})
@@ -79,6 +87,8 @@ def update_tooltip(hover_data):
         'borderRadius': '5px',
         'background': 'white',
         'visibility': 'visible',
+        'max-width': '90%',  # 限制 Tooltip 宽度
+        'word-wrap': 'break-word',  # 自动换行
         'bottom': '50px',  # 调整到下方
         'left': '50%',    # 水平居中
         'transform': 'translateX(-50%)'  # 居中对齐
@@ -107,4 +117,3 @@ port = int(os.environ.get("PORT", 8050))
 # 运行服务器
 if __name__ == '__main__':
     app.run_server(debug=False, host="0.0.0.0", port=port)
-
