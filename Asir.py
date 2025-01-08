@@ -29,7 +29,7 @@ fig = px.scatter_3d(
     custom_data=["Photo route", "Species"]  # 包含图片路径和 Species
 )
 
-# 图表布局设置，调整图例和图表布局
+# 图表布局设置，调整图例为竖向
 fig.update_layout(
     scene=dict(
         xaxis_title="Soil Type<br>0: Salty | 1: Sandy | 2: Rocky | 3: Loamy Soil",
@@ -38,11 +38,11 @@ fig.update_layout(
     ),
     margin=dict(l=0, r=0, t=0, b=0),
     legend=dict(
-        x=0,  # 图例左对齐
-        y=0,  # 图例底部对齐
-        orientation="h",  # 水平显示图例
+        x=1,  # 图例靠右
+        y=1,  # 图例顶部对齐
+        orientation="v",  # 竖直显示图例
         xanchor="left",
-        yanchor="bottom"
+        yanchor="top"
     )
 )
 
@@ -74,20 +74,15 @@ app.layout = html.Div([
 @app.callback(
     [Output('tooltip-container', 'children'),
      Output('tooltip-container', 'style')],
-    [Input('3d-scatter-plot', 'hoverData'),
-     Input('3d-scatter-plot', 'clickData')]  # 添加 clickData 输入
+    Input('3d-scatter-plot', 'hoverData')
 )
-def update_tooltip(hover_data, click_data):
-    if hover_data is None and click_data is None:
+def update_tooltip(hover_data):
+    if hover_data is None:
         # 隐藏 Tooltip
         return None, {'visibility': 'hidden'}
 
-    # 如果 Hover 或点击事件中包含数据
-    if hover_data:
-        customdata = hover_data['points'][0]['customdata']
-    elif click_data:
-        customdata = click_data['points'][0]['customdata']
-
+    # 如果 Hover 中包含数据
+    customdata = hover_data['points'][0]['customdata']
     photo_url = customdata[0]  # 图片链接
     species = customdata[1]    # 植物名称
 
