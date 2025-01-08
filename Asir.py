@@ -29,14 +29,19 @@ fig = px.scatter_3d(
     custom_data=["Photo route", "Species"]  # 包含图片路径和 Species
 )
 
-# 图表布局设置
+# 图表布局设置，调整图例的位置
 fig.update_layout(
     scene=dict(
         xaxis_title="Soil Type<br>0: Salty | 1: Sandy | 2: Rocky | 3: Loamy Soil",
         yaxis_title="Climate<br>1: Arid | 2: Semi-Arid | 3: Sub-Humid",
         zaxis_title="Elevation<br>1: Lowland | 2: Mid-altitude | 3: Highland"
     ),
-    margin=dict(l=0, r=0, t=0, b=0)
+    margin=dict(l=0, r=0, t=0, b=0),
+    legend=dict(
+        x=0,  # 图例移动到左下角
+        y=-0.2,
+        orientation="h"  # 水平显示图例
+    )
 )
 
 # Dash 应用布局
@@ -57,7 +62,7 @@ app.layout = html.Div([
             'visibility': 'hidden',
             'max-width': '90%',  # 限制 Tooltip 的宽度
             'word-wrap': 'break-word',  # 防止内容溢出
-            'bottom': '50px',  # 设置位置为下方
+            'bottom': '10px',  # Tooltip 在屏幕底部显示，避免重叠
             'left': '50%',    # 水平居中
             'transform': 'translateX(-50%)'  # 居中对齐
         }
@@ -89,7 +94,7 @@ def update_tooltip(hover_data):
         'visibility': 'visible',
         'max-width': '90%',  # 限制 Tooltip 宽度
         'word-wrap': 'break-word',  # 自动换行
-        'bottom': '50px',  # 调整到下方
+        'bottom': '10px',  # Tooltip 在屏幕底部显示
         'left': '50%',    # 水平居中
         'transform': 'translateX(-50%)'  # 居中对齐
     }
