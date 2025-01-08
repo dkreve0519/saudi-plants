@@ -7,7 +7,7 @@ import pandas as pd
 app = dash.Dash(__name__)
 
 # 加载 Excel 数据
-file_path = "/Users/amgc/Desktop/Asir.xlsx"
+file_path = "Asir.xlsx"
 df = pd.read_excel(file_path)
 
 # 创建 3D 散点图，确保 custom_data 包含所有需要的信息
